@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLC Dashboard — Criminal Justice Institute</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cji-crimson: #9D2235;
+    --cji-crimson-dark: #7a1a28;
+    --cji-crimson-light: #f5e8ea;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f7f6;
+    --bg-tertiary: #f0efed;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --text-tertiary: #9a9a9a;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --green-bg: #EAF3DE; --green-text: #3B6D11;
+    --amber-bg: #FAEEDA; --amber-text: #854F0B;
+    --red-bg: #FCEBEB; --red-text: #A32D2D;
+    --blue-bg: #E6F1FB; --blue-text: #185FA5;
+    --gray-bg: #F1EFE8; --gray-text: #5F5E5A;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--cji-crimson);
+    color: white;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 36px; height: 36px; background: rgba(255,255,255,0.2);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 14px; letter-spacing: 0.5px;
+  }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  .header-date { font-size: 12px; opacity: 0.8; }
+
+  /* LAYOUT */
+  .shell { display: flex; min-height: calc(100vh - 64px); }
+  .sidebar {
+    width: 200px; min-width: 200px; background: var(--bg-primary);
+    border-right: 0.5px solid var(--border); padding: 1.25rem 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 20px; font-size: 13px; font-weight: 400;
+    color: var(--text-secondary); cursor: pointer;
+    border: none; background: transparent; width: 100%;
+    text-align: left; border-left: 3px solid transparent;
+    transition: background 0.15s;
+    font-family: 'Poppins', sans-serif;
+  }
+  .nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .nav-item.active {
+    color: var(--cji-crimson); font-weight: 500;
+    background: var(--cji-crimson-light);
+    border-left-color: var(--cji-crimson);
+  }
+  .nav-icon { font-size: 16px; width: 18px; text-align: center; }
+
+  .main { flex: 1; padding: 1.75rem 2rem; overflow-y: auto; }
+
+  /* TABS */
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-primary); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 500; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+  }
+
+  /* METRICS */
+  .metric-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--bg-secondary); border-radius: var(--radius-md);
+    padding: 1rem; text-align: center;
+  }
+  .metric .label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
+  .metric .value { font-size: 26px; font-weight: 600; }
+
+  /* TABLE ROWS */
+  .row-hdr {
+    display: grid; gap: 8px; font-size: 11px; color: var(--text-secondary);
+    font-weight: 500; padding: 0 8px 6px;
+    border-bottom: 0.5px solid var(--border); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .item-row {
+    display: grid; gap: 8px; align-items: center;
+    padding: 9px 8px; border-radius: var(--radius-md); font-size: 13px;
+  }
+  .item-row:hover { background: var(--bg-secondary); }
+
+  /* BADGES */
+  .badge {
+    display: inline-block; padding: 2px 9px;
+    border-radius: var(--radius-md); font-size: 11px; font-weight: 500;
+  }
+  .b-green { background: var(--green-bg); color: var(--green-text); }
+  .b-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .b-red   { background: var(--red-bg);   color: var(--red-text); }
+  .b-blue  { background: var(--blue-bg);  color: var(--blue-text); }
+  .b-gray  { background: var(--gray-bg);  color: var(--gray-text); }
+
+  /* SCORE BAR */
+  .score-bar {
+    height: 5px; border-radius: 3px; background: var(--bg-secondary); overflow: hidden; margin-top: 3px;
+  }
+  .score-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+  /* FORMS */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; font-weight: 500; }
+  input, select, textarea {
+    font-family: 'Poppins', sans-serif; font-size: 13px;
+    border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
+    padding: 7px 10px; background: var(--bg-primary); color: var(--text-primary);
+    outline: none; transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--cji-crimson); }
+
+  .inline-form {
+    background: var(--bg-secondary); border-radius: var(--radius-md);
+    padding: 14px; margin-top: 10px; display: none;
+  }
+  .inline-form.open { display: block; }
+
+  .add-btn {
+    border: 0.5px dashed var(--border-strong); background: transparent;
+    padding: 8px; border-radius: var(--radius-md); width: 100%;
+    font-size: 12px; color: var(--text-secondary); cursor: pointer;
+    margin-top: 8px; font-family: 'Poppins', sans-serif;
+  }
+  .add-btn:hover { background: var(--bg-secondary); }
+
+  .btn {
+    padding: 7px 16px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-strong); background: transparent;
+    cursor: pointer; font-size: 13px; font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+  }
+  .btn:hover { background: var(--bg-secondary); }
+  .btn-primary {
+    background: var(--cji-crimson); color: white; border-color: var(--cji-crimson);
+  }
+  .btn-primary:hover { background: var(--cji-crimson-dark); }
+
+  .action-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+  .del-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-tertiary); padding: 3px 6px; font-size: 16px;
+  }
+  .del-btn:hover { color: var(--red-text); }
+
+  /* AI CHAT */
+  .ai-messages {
+    min-height: 200px; max-height: 340px; overflow-y: auto;
+    margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;
+    padding: 4px 0;
+  }
+  .msg-user {
+    align-self: flex-end; background: var(--cji-crimson-light);
+    color: var(--cji-crimson-dark); padding: 9px 13px;
+    border-radius: var(--radius-md); max-width: 80%; font-size: 13px; line-height: 1.5;
+  }
+  .msg-ai {
+    align-self: flex-start; background: var(--bg-secondary);
+    padding: 9px 13px; border-radius: var(--radius-md);
+    max-width: 90%; font-size: 13px; line-height: 1.6; white-space: pre-wrap;
+  }
+  .ai-input-row { display: flex; gap: 8px; }
+  .ai-input-row input { flex: 1; }
+  .prompt-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip {
+    padding: 5px 11px; border-radius: 20px;
+    border: 0.5px solid var(--border-strong); background: transparent;
+    font-size: 12px; cursor: pointer; color: var(--text-secondary);
+    font-family: 'Poppins', sans-serif; transition: background 0.15s;
+  }
+  .chip:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+  /* SPINNER */
+  .spinner {
+    display: inline-block; width: 13px; height: 13px;
+    border: 2px solid var(--border-strong); border-top-color: var(--text-secondary);
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TWO-COL OVERVIEW GRID */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) {
+    .overview-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .shell { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; flex-direction: row; flex-wrap: wrap; padding: 0.5rem; }
+  }
+
+  /* SECTION HEADING */
+  .section-heading {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--text-tertiary); margin: 0 0 1rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">CJI</div>
+    <div>
+      <div class="header-title">Online Learning Center Dashboard</div>
+      <div class="header-sub">University of Arkansas System · Criminal Justice Institute</div>
+    </div>
+  </div>
+  <div class="header-date" id="date-display"></div>
+</header>
+
+<div class="shell">
+
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar" aria-label="Main navigation">
+    <button class="nav-item active" onclick="showTab('overview', this)">
+      <span class="nav-icon">⌂</span> Overview
+    </button>
+    <button class="nav-item" onclick="showTab('schedule', this)">
+      <span class="nav-icon">📅</span> Schedule
+    </button>
+    <button class="nav-item" onclick="showTab('ally', this)">
+      <span class="nav-icon">♿</span> Accessibility
+    </button>
+    <button class="nav-item" onclick="showTab('ai', this)">
+      <span class="nav-icon">✦</span> AI Assistant
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main-content">
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab active" role="tabpanel">
+      <p class="section-heading">At a glance</p>
+      <div class="metric-grid" id="metric-grid"></div>
+      <div class="overview-grid">
+        <div class="card">
+          <div class="card-title">📅 Upcoming start dates</div>
+          <div id="upcoming-list" style="font-size:13px;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ Accessibility alerts</div>
+          <div id="ally-alerts" style="font-size:13px;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE TAB -->
+    <div id="tab-schedule" class="tab" role="tabpanel">
+      <p class="section-heading">Course schedule</p>
+      <div class="card">
+        <div class="card-title">📅 All courses</div>
+        <div class="row-hdr" style="grid-template-columns:2fr 1fr 1fr 1fr 100px 40px">
+          <span>Course</span><span>Instructor</span><span>Start</span><span>End</span><span>Status</span><span></span>
+        </div>
+        <div id="course-list"></div>
+        <button class="add-btn" onclick="toggleForm('add-course-form')">＋ Add course</button>
+        <div class="inline-form" id="add-course-form">
+          <div class="form-row">
+            <div><div class="form-label">Course name</div><input type="text" id="f-name" placeholder="e.g. Evidence-Based Policing" style="width:100%"></div>
+            <div><div class="form-label">Instructor</div><input type="text" id="f-instr" placeholder="Last, First" style="width:100%"></div>
+          </div>
+          <div class="form-row">
+            <div><div class="form-label">Start date</div><input type="date" id="f-start" style="width:100%"></div>
+            <div><div class="form-label">End date</div><input type="date" id="f-end" style="width:100%"></div>
+          </div>
+          <div><div class="form-label">Status</div>
+            <select id="f-status" style="width:200px">
+              <option>Scheduled</option><option>Active</option><option>In Development</option><option>Completed</option>
+            </select>
+          </div>
+          <div class="action-row">
+            <button class="btn" onclick="toggleForm('add-course-form')">Cancel</button>
+            <button class="btn btn-primary" onclick="addCourse()">Save course</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESSIBILITY TAB -->
+    <div id="tab-ally" class="tab" role="tabpanel">
+      <p class="section-heading">Blackboard Ally tracker</p>
+      <div class="metric-grid" id="ally-metric-grid"></div>
+      <div class="card">
+        <div class="card-title">♿ Documents &amp; course shells</div>
+        <div class="row-hdr" style="grid-template-columns:2fr 1fr 1.2fr 90px 100px 40px">
+          <span>Item</span><span>Type</span><span>Course</span><span>Ally score</span><span>Status</span><span></span>
+        </div>
+        <div id="ally-list"></div>
+        <button class="add-btn" onclick="toggleForm('add-ally-form')">＋ Add item</button>
+        <div class="inline-form" id="add-ally-form">
+          <div class="form-row">
+            <div><div class="form-label">Item name</div><input type="text" id="a-name" placeholder="Filename or shell name" style="width:100%"></div>
+            <div><div class="form-label">Type</div>
+              <select id="a-type" style="width:100%">
+                <option>PDF</option><option>Course shell</option><option>Word doc</option><option>PowerPoint</option><option>HTML</option><option>Video</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div><div class="form-label">Course</div><input type="text" id="a-course" placeholder="Course name or N/A" style="width:100%"></div>
+            <div><div class="form-label">Ally score (0–100)</div><input type="number" id="a-score" min="0" max="100" placeholder="e.g. 72" style="width:100%"></div>
+          </div>
+          <div><div class="form-label">Remediation status</div>
+            <select id="a-status" style="width:220px">
+              <option>Needs remediation</option><option>In progress</option><option>Remediated</option><option>Reviewed</option>
+            </select>
+          </div>
+          <div class="action-row">
+            <button class="btn" onclick="toggleForm('add-ally-form')">Cancel</button>
+            <button class="btn btn-primary" onclick="addAllyItem()">Save item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT TAB -->
+    <div id="tab-ai" class="tab" role="tabpanel">
+      <p class="section-heading">AI assistant</p>
+      <div class="card">
+        <div class="card-title">✦ Ask Claude</div>
+        <div class="prompt-chips">
+          <button class="chip" onclick="quickPrompt('Draft a professional email to an instructor whose course has a low Blackboard Ally accessibility score and needs to provide alt text for images.')">Draft instructor email</button>
+          <button class="chip" onclick="quickPrompt('Write a 3-sentence course description for an online law enforcement training course on evidence collection and chain of custody.')">Write course description</button>
+          <button class="chip" onclick="quickPrompt('What are best practices for remediating PDF accessibility issues to meet Section 508 and WCAG 2.1 AA standards?')">508 remediation tips</button>
+          <button class="chip" onclick="quickPrompt('Generate descriptive alt text for an image of a forensic investigator photographing evidence at a crime scene.')">Generate alt text</button>
+          <button class="chip" onclick="summarizeData()">Summarize my data ↗</button>
+        </div>
+        <div class="ai-messages" id="ai-messages" aria-live="polite">
+          <div class="msg-ai">Hi! I'm your OLC assistant. I can draft instructor emails, write course descriptions, generate alt text, answer Section 508 / WCAG questions, and summarize your schedule and Ally data. What do you need?</div>
+        </div>
+        <div class="ai-input-row">
+          <input type="text" id="ai-input" placeholder="Ask anything about your courses, accessibility, or drafting..." onkeydown="if(event.key==='Enter')sendAI()" aria-label="Message input">
+          <button class="btn btn-primary" onclick="sendAI()">Send</button>
+        </div>
+        <p style="font-size:11px;color:var(--text-tertiary);margin-top:8px;">
+          ⚠️ Requires an Anthropic API key. Open this file in a text editor and replace <code>YOUR_API_KEY_HERE</code> near the bottom of the script with your key.
+        </p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = 'olc_dashboard_v2';
+// ── REPLACE THIS with your Anthropic API key if you want the AI assistant to work ──
+const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return {
+    courses: [
+      { id:1, name:'Behavioral Health & Crisis Intervention', instructor:'Smith, J.', start:'2026-06-01', end:'2026-08-15', status:'In Development' },
+      { id:2, name:'Evidence-Based Policing', instructor:'Johnson, M.', start:'2026-06-08', end:'2026-08-22', status:'Scheduled' },
+      { id:3, name:'Forensic Genealogy', instructor:'Williams, K.', start:'2026-05-12', end:'2026-07-18', status:'Active' },
+    ],
+    ally: [
+      { id:1, name:'Forensic Genealogy Course Manual.pdf', type:'PDF', course:'Forensic Genealogy', score:48, status:'In progress' },
+      { id:2, name:'Crisis Intervention Reference Guide.pdf', type:'PDF', course:'Behavioral Health & Crisis Intervention', score:31, status:'Needs remediation' },
+      { id:3, name:'BHC shell', type:'Course shell', course:'Behavioral Health & Crisis Intervention', score:72, status:'In progress' },
+      { id:4, name:'EBP Intro Module.pptx', type:'PowerPoint', course:'Evidence-Based Policing', score:89, status:'Reviewed' },
+    ]
+  };
+}
+
+let state = loadData();
+let aiHistory = [];
+
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'overview')  renderOverview();
+  if (name === 'schedule')  renderSchedule();
+  if (name === 'ally')      renderAlly();
+}
+
+function toggleForm(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function statusBadge(s) {
+  const map = {
+    'Active':'b-green','Scheduled':'b-blue','In Development':'b-amber','Completed':'b-gray',
+    'Remediated':'b-green','Reviewed':'b-green','In progress':'b-amber','Needs remediation':'b-red'
+  };
+  return `<span class="badge ${map[s]||'b-gray'}">${s}</span>`;
+}
+
+function scoreColor(n) {
+  if (n >= 80) return '#3B6D11';
+  if (n >= 50) return '#854F0B';
+  return '#A32D2D';
+}
+
+/* ── OVERVIEW ── */
+function renderOverview() {
+  const total    = state.courses.length;
+  const active   = state.courses.filter(c => c.status === 'Active').length;
+  const needsRem = state.ally.filter(a => a.status === 'Needs remediation').length;
+  const avgScore = state.ally.length
+    ? Math.round(state.ally.reduce((s,a) => s + a.score, 0) / state.ally.length) : 0;
+
+  document.getElementById('metric-grid').innerHTML = `
+    <div class="metric"><div class="label">Total courses</div><div class="value">${total}</div></div>
+    <div class="metric"><div class="label">Active</div><div class="value" style="color:var(--green-text)">${active}</div></div>
+    <div class="metric"><div class="label">Items tracked</div><div class="value">${state.ally.length}</div></div>
+    <div class="metric"><div class="label">Avg Ally score</div><div class="value" style="color:${scoreColor(avgScore)}">${avgScore}%</div></div>
+    <div class="metric"><div class="label">Need remediation</div><div class="value" style="color:var(--red-text)">${needsRem}</div></div>
+  `;
+
+  const today = new Date();
+  const upcoming = state.courses
+    .filter(c => new Date(c.start) >= today)
+    .sort((a,b) => new Date(a.start) - new Date(b.start))
+    .slice(0, 5);
+  document.getElementById('upcoming-list').innerHTML = upcoming.length
+    ? upcoming.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border)">
+        <span>${c.name}</span>
+        <span style="font-size:11px;color:var(--text-secondary);white-space:nowrap;margin-left:8px">${c.start}</span>
+      </div>`).join('')
+    : '<div style="color:var(--text-tertiary);font-size:12px">No upcoming start dates.</div>';
+
+  const alerts = state.ally.filter(a => a.score < 50);
+  document.getElementById('ally-alerts').innerHTML = alerts.length
+    ? alerts.map(a => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border)">
+        <span style="font-size:12px">${a.name}</span>
+        <span style="color:var(--red-text);font-weight:600;margin-left:8px">${a.score}%</span>
+      </div>`).join('')
+    : '<div style="color:var(--green-text);font-size:12px">✓ No critical alerts.</div>';
+}
+
+/* ── SCHEDULE ── */
+function renderSchedule() {
+  document.getElementById('course-list').innerHTML = state.courses.map(c => `
+    <div class="item-row" style="grid-template-columns:2fr 1fr 1fr 1fr 100px 40px">
+      <span style="font-weight:500">${c.name}</span>
+      <span style="color:var(--text-secondary)">${c.instructor}</span>
+      <span style="color:var(--text-secondary)">${c.start}</span>
+      <span style="color:var(--text-secondary)">${c.end}</span>
+      <span>${statusBadge(c.status)}</span>
+      <button class="del-btn" onclick="deleteCourse(${c.id})" aria-label="Delete ${c.name}">🗑</button>
+    </div>`).join('');
+}
+
+function addCourse() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) return;
+  state.courses.push({
+    id: Date.now(),
+    name,
+    instructor: document.getElementById('f-instr').value || '—',
+    start:      document.getElementById('f-start').value || '—',
+    end:        document.getElementById('f-end').value   || '—',
+    status:     document.getElementById('f-status').value
+  });
+  saveData();
+  toggleForm('add-course-form');
+  ['f-name','f-instr','f-start','f-end'].forEach(id => document.getElementById(id).value = '');
+  renderSchedule(); renderOverview();
+}
+
+function deleteCourse(id) {
+  if (!confirm('Remove this course?')) return;
+  state.courses = state.courses.filter(c => c.id !== id);
+  saveData(); renderSchedule(); renderOverview();
+}
+
+/* ── ACCESSIBILITY ── */
+function renderAlly() {
+  const total    = state.ally.length;
+  const avgScore = total ? Math.round(state.ally.reduce((s,a) => s + a.score, 0) / total) : 0;
+  const remediated = state.ally.filter(a => a.status === 'Remediated' || a.status === 'Reviewed').length;
+  const critical   = state.ally.filter(a => a.score < 50).length;
+
+  document.getElementById('ally-metric-grid').innerHTML = `
+    <div class="metric"><div class="label">Items tracked</div><div class="value">${total}</div></div>
+    <div class="metric"><div class="label">Avg Ally score</div><div class="value" style="color:${scoreColor(avgScore)}">${avgScore}%</div></div>
+    <div class="metric"><div class="label">Remediated / reviewed</div><div class="value" style="color:var(--green-text)">${remediated}</div></div>
+    <div class="metric"><div class="label">Critical (&lt;50%)</div><div class="value" style="color:var(--red-text)">${critical}</div></div>
+  `;
+
+  document.getElementById('ally-list').innerHTML = state.ally.map(a => `
+    <div class="item-row" style="grid-template-columns:2fr 1fr 1.2fr 90px 100px 40px">
+      <span style="font-weight:500">${a.name}</span>
+      <span><span class="badge b-gray">${a.type}</span></span>
+      <span style="color:var(--text-secondary);font-size:12px">${a.course}</span>
+      <span>
+        <div style="font-size:13px;font-weight:600;color:${scoreColor(a.score)}">${a.score}%</div>
+        <div class="score-bar"><div class="score-fill" style="width:${a.score}%;background:${scoreColor(a.score)}"></div></div>
+      </span>
+      <span>${statusBadge(a.status)}</span>
+      <button class="del-btn" onclick="deleteAlly(${a.id})" aria-label="Delete ${a.name}">🗑</button>
+    </div>`).join('');
+}
+
+function addAllyItem() {
+  const name = document.getElementById('a-name').value.trim();
+  if (!name) return;
+  state.ally.push({
+    id:     Date.now(),
+    name,
+    type:   document.getElementById('a-type').value,
+    course: document.getElementById('a-course').value || '—',
+    score:  parseInt(document.getElementById('a-score').value) || 0,
+    status: document.getElementById('a-status').value
+  });
+  saveData();
+  toggleForm('add-ally-form');
+  ['a-name','a-course','a-score'].forEach(id => document.getElementById(id).value = '');
+  renderAlly(); renderOverview();
+}
+
+function deleteAlly(id) {
+  if (!confirm('Remove this item?')) return;
+  state.ally = state.ally.filter(a => a.id !== id);
+  saveData(); renderAlly(); renderOverview();
+}
+
+/* ── AI ASSISTANT ── */
+function quickPrompt(text) {
+  document.getElementById('ai-input').value = text;
+  sendAI();
+}
+
+function summarizeData() {
+  const text = `Summarize my current OLC data and flag any priorities I should address this week.\n\nCourses (${state.courses.length}):\n${state.courses.map(c=>`- ${c.name} | ${c.instructor} | ${c.start}–${c.end} | ${c.status}`).join('\n')}\n\nAccessibility items (${state.ally.length}):\n${state.ally.map(a=>`- ${a.name} | ${a.type} | Ally: ${a.score}% | ${a.status}`).join('\n')}`;
+  document.getElementById('ai-input').value = text;
+  sendAI();
+}
+
+async function sendAI() {
+  const input = document.getElementById('ai-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('ai-messages');
+  msgs.innerHTML += `<div class="msg-user">${escHtml(text)}</div>`;
+  const loadingId = 'loading-' + Date.now();
+  msgs.innerHTML += `<div class="msg-ai" id="${loadingId}"><span class="spinner"></span>Thinking…</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  aiHistory.push({ role: 'user', content: text });
+
+  if (ANTHROPIC_API_KEY === 'YOUR_API_KEY_HERE') {
+    document.getElementById(loadingId).innerHTML =
+      '⚠️ No API key set. Open this file in a text editor and replace <code>YOUR_API_KEY_HERE</code> with your Anthropic API key.';
+    return;
+  }
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are an AI assistant for the Online Learning Center at the Criminal Justice Institute (CJI), University of Arkansas System. The coordinator is CJ Fortune. Help with: drafting professional instructor emails, writing online course descriptions for law enforcement training, accessibility remediation (Section 508, WCAG 2.1 AA, Blackboard Ally), generating descriptive alt text for instructional images, and summarizing course schedule or accessibility data. CJI primary color is crimson #9D2235. Keep responses concise and professional. For emails, use a direct, non-frustrated tone.`,
+        messages: aiHistory
+      })
+    });
+    const data  = await resp.json();
+    const reply = data.content?.find(b => b.type === 'text')?.text || 'Sorry, no response received.';
+    aiHistory.push({ role: 'assistant', content: reply });
+    if (aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+    document.getElementById(loadingId).innerHTML = escHtml(reply).replace(/\n/g, '<br>');
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch(e) {
+    document.getElementById(loadingId).innerHTML = 'Connection error. Check your API key and internet connection.';
+  }
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── INIT ── */
+document.getElementById('date-display').textContent =
+  new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+
+renderOverview();
+</script>
+</body>
+</html>
