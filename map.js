@@ -185,8 +185,8 @@ async function initMap() {
     .attr('preserveAspectRatio', 'xMidYMid meet');
 
   const arCollection = { type: 'FeatureCollection', features: state.arFeatures };
-  const projection = d3.geoIdentity().reflectY(false)
-    .fitExtent([[20, 20], [W - 20, H - 20]], arCollection);
+  const projection = d3.geoIdentity().reflectY(true)
+  .fitExtent([[20, 20], [W - 20, H - 20]], arCollection);
   state.pathGen = d3.geoPath().projection(projection);
 
   // Clip paths (one per county) used for pie-wedge fills
