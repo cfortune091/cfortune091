@@ -185,7 +185,7 @@ async function initMap() {
     .attr('preserveAspectRatio', 'xMidYMid meet');
 
   const arCollection = { type: 'FeatureCollection', features: state.arFeatures };
-  const projection = d3.geoIdentity().reflectY(true)
+  const projection = d3.geoIdentity()
     .fitExtent([[20, 20], [W - 20, H - 20]], arCollection);
   state.pathGen = d3.geoPath().projection(projection);
 
