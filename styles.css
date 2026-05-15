@@ -593,6 +593,63 @@ body {
 }
 
 /* ============================================================
+   Settings panel
+   ============================================================ */
+.settings-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 16px;
+  gap: 0;
+}
+
+.settings-tab-btn {
+  background: none;
+  border: none;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s;
+}
+
+.settings-tab-btn:hover { color: var(--navy); }
+.settings-tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+.settings-list { display: flex; flex-direction: column; gap: 8px; }
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-color-input {
+  width: 38px;
+  height: 34px;
+  padding: 2px 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: none;
+  flex-shrink: 0;
+}
+
+.settings-name-input { flex: 1; }
+
+.settings-active-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ============================================================
    Modal
    ============================================================ */
 .modal-overlay {
