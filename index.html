@@ -16,6 +16,27 @@ $ cat /home/user/cfortune091/index.html
 <!-- TOOLTIP -->
 <div id="tooltip"></div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Settings</div>
+      <button class="icon-btn" onclick="closeSettingsModal()" title="Close">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-tabs">
+        <button class="settings-tab-btn active" data-settings-tab="departments" onclick="renderSettingsTab('departments')">Departments</button>
+        <button class="settings-tab-btn" data-settings-tab="statuses" onclick="renderSettingsTab('statuses')">Statuses</button>
+      </div>
+      <div id="settings-tab-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeSettingsModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettingsAndClose()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD / EDIT CLASS MODAL -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
@@ -29,22 +50,16 @@ $ cat /home/user/cfortune091/index.html
         <!-- County -->
         <div class="form-group">
           <label class="form-label" for="f-county">County *</label>
-          <!-- Options populated by JS init() via COUNTY_NAMES -->
           <select class="form-select" id="f-county">
             <option value="">Select county&hellip;</option>
           </select>
         </div>
 
-        <!-- Department -->
+        <!-- Department — populated by JS from settings -->
         <div class="form-group">
           <label class="form-label" for="f-department">Department *</label>
           <select class="form-select" id="f-department">
             <option value="">Select department&hellip;</option>
-            <option>DEC</option>
-            <option>Forensics</option>
-            <option>LEMD</option>
-            <option>ACSS</option>
-            <option>VAWA</option>
           </select>
         </div>
 
@@ -54,15 +69,11 @@ $ cat /home/user/cfortune091/index.html
           <input class="form-input" type="text" id="f-classTitle" placeholder="e.g. Evidence-Based Policing">
         </div>
 
-        <!-- Status -->
+        <!-- Status — populated by JS from settings -->
         <div class="form-group">
           <label class="form-label" for="f-status">Status *</label>
           <select class="form-select" id="f-status">
             <option value="">Select status&hellip;</option>
-            <option>Scheduled</option>
-            <option>In Progress</option>
-            <option>Completed</option>
-            <option>Cancelled</option>
           </select>
         </div>
 
@@ -136,6 +147,7 @@ $ cat /home/user/cfortune091/index.html
     <button class="btn btn-sm" onclick="exportToExcel()" title="Export all data to Excel">&#8595; Export</button>
     <button class="btn btn-sm" onclick="downloadTemplate()" title="Download blank import template">&#128203; Template</button>
     <button class="btn btn-sm" onclick="triggerPrint()" title="Print or save as PDF">&#128424; Print</button>
+    <button class="btn btn-sm" onclick="openSettingsModal()" title="Manage departments, statuses, and colors">&#9881; Settings</button>
   </div>
 </header>
 
